@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import random
 import db #import module created to write/read money file
 #db.readMoney()
 #db.writeMoney()
@@ -36,3 +36,43 @@ def pointValue(card):
             else:
                 num = input("Do you want this to be 1 or 11?\n>")
 
+def dealerHand(deck):
+    dealerHand = []
+    card = random.choice(deck)
+    dealerHand.append(card)
+    print(dealerHand)
+    return dealerHand
+
+def playerHand(deck):
+    playerHand = []
+    card = random.choice(deck)
+    playerHand.append(card)
+    print(playerHand)
+    return playerHand
+
+def hitOrStand():
+    playerChoice = "hit"
+    pass
+
+def dealerScore(dealerHand):
+    pass
+
+def playerScore(playerHand):
+    pass
+
+def playerBet(money):
+    pass
+
+def winnings(money):
+    pass
+
+
+
+
+def main():
+    deck = deckOfCards()
+    #print(deck)
+    dealerHand(deck)
+
+if __name__ == "__main__":
+    main()
