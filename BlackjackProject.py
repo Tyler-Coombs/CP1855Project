@@ -55,10 +55,16 @@ def hitOrStand():
     pass
 
 def dealerScore(dealerHand):
-    pass
+    points = 0
+    for card in dealerHand:
+        points += pointValue(card)
+        return points
 
 def playerScore(playerHand):
-    pass
+    points = 0
+    for card in playerHand:
+        points += pointValue(card)
+        return points
 
 def playerBet(money):
     pass
@@ -66,8 +72,25 @@ def playerBet(money):
 def winnings(money):
     pass
 
+def readMoney():
+    money = 0
+    try:
+        with open("money.txt") as file:
+            money = file.read()
+        return float(money)
+    except FileNotFoundError:
+        print("Could not find money file.")
+        exit_program()
+    except Exception as e:
+        print(type(e), e)
+        exit_program()
 
+def writeMoney(money):
+    with open("money.txt", "w") as file:
+        file.write(money)
 
+def playGame():
+    pass
 
 def main():
     deck = deckOfCards()
