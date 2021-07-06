@@ -66,7 +66,7 @@ def playerScore(playerHand):
         points += pointValue(card)
         return points
 
-def playerBet(money):
+def playerBet():
     money = db.readMoney()
     print("Money: " + money)
     betAmount = input("Bet Amount: ")
@@ -77,16 +77,21 @@ def playerBet(money):
     else:
         money = money - betAmount
         db.writeMoney()
-        return money
+        return betAmount
 
-def winnings(money):
-    pass
+def winnings():
+    betAmount = playerBet()
+    winAmount = betAmount * 1.5
+    money = db.readMoney()
+    money = money + winAmount
+    db.writeMoney(money)
 
 def playGame(deck):
     playerHand = []
     dealerHand = []
     playerScore = 0
     dealerScore = 0
+
 
     print("DEALER'S SHOW CARD")
     dealerCard = random.choice(deck)
@@ -130,13 +135,50 @@ def playGame(deck):
 
             playerScore += pointValue(card)
             print(playerHand)
+            continue
 
+        elif choice.lower() == "stand"
+            break
+
+        else:
+            print("Please enter hit or stand.")
+            continue
+
+    print("DEALER'S CARDS: ")
+    print(dealerHand)
+
+    print("YOUR POINTS:\t" + str(playerScore))
+    print("DEALER'S POINTS:\t" + str(dealerScore))
+
+    if playerScore == 21 and dealerScore < 21:
+        print("YOU HAVE A BLACKJACK!")
+        print("YOU WIN!")
+        winnings()
+        money = db.readMoney()
+        print("Money: " + str(money)
         
-    
+    elif dealerScore > playerScore:
+        print("Sorry. You lose.")
+    elif dealerScore == 21 and playerScore < 21:
+        print("Sorry. You lose.")
+    elif playerScore == 21 and dealerScore == 21:
+        print("Draw. No winners. You get your money back.")
+    elif playerScore > 21:
+        print("BUST. Sorry. You lose.")
+        
 
 def main():
+    playAgain = "y"
     deck = deckOfCards()
-    print(deck)
+    while playAgain.lower() == "y":
+
+        playerBet()
+        playGame()
+
+
+        playAgain = input("Play again? (y/n): ")
+        print()
+    print("Come back soon! \nBye!")
 
 
 if __name__ == "__main__":
