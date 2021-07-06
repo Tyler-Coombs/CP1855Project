@@ -67,35 +67,77 @@ def playerScore(playerHand):
         return points
 
 def playerBet(money):
-    pass
+    money = db.readMoney()
+    print("Money: " + money)
+    betAmount = input("Bet Amount: ")
+    if betAmount < 5 or betAmount > 1000:
+        print("Invalid bet amount. Please bet between 5 and 1000.")
+    elif betAmount > money:
+        print("Invalid bet amount. You cannot bet more money than you have.")
+    else:
+        money = money - betAmount
+        db.writeMoney()
+        return money
 
 def winnings(money):
     pass
 
-def readMoney():
-    money = 0
-    try:
-        with open("money.txt") as file:
-            money = file.read()
-        return float(money)
-    except FileNotFoundError:
-        print("Could not find money file.")
-        exit_program()
-    except Exception as e:
-        print(type(e), e)
-        exit_program()
+def playGame(deck):
+    playerHand = []
+    dealerHand = []
+    playerScore = 0
+    dealerScore = 0
 
-def writeMoney(money):
-    with open("money.txt", "w") as file:
-        file.write(money)
+    print("DEALER'S SHOW CARD")
+    dealerCard = random.choice(deck)
+    dealerHand.append(dealerCard)
+    deck.remove(dealerCard)
+    card = dealerCard
+    dealerScore += pointValue(card)
+    print(dealerHand)
+    if len(dealerHand) == 2:
+        if pointValue(dealerHand[0]) == 11 and pointValue(dealerHand[1]) == 11:
+            pointValue(dealerHand[1]) = 1
+            dealerScore -= 10
+    
+    while len(playerHand) < 2:
+        playerCard = random.choice(deck)
+        playerHand.append(playerCard)
+        deck.remove(playerCard)
+        card = playerCard
+        playerScore += pointValue(card)
 
-def playGame():
-    pass
+        if len(playerHand) == 2:
+            if pointValue(playerHand[0]) == 11 and pointValue(playerHand[1]) == 11:
+                pointValue(playerHand[0]) = 1
+                playerScore -= 10
+        
+        print("YOUR CARDS: ")
+        print(playerHand)
+        
+    if playerScore == 21:
+        print("YOU HAVE A BLACKJACK!")
+        print("YOU WIN!")
+
+    while playerScore < 21:
+        choice = input("Hit or stand? (hit/stand): ")
+        if choice.lower() == "hit"
+
+            playerCard = random.choice(deck)
+            playerHand.append(playerCard)
+            deck.remove(playerCard)
+            card = playerCard
+
+            playerScore += pointValue(card)
+            print(playerHand)
+
+        
+    
 
 def main():
     deck = deckOfCards()
-    #print(deck)
-    dealerHand(deck)
+    print(deck)
+
 
 if __name__ == "__main__":
     main()
