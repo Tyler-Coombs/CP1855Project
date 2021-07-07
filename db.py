@@ -1,11 +1,17 @@
 #module for writing and reading money.txt file
-
+import sys
+def exit_program():
+    print("Terminating program.")
+    sys.exit()
 #function to read money file
 def readMoney():
+    money = []
     try:
         with open("money.txt") as file:
-            money = file.read()
-        return float(money)
+            for line in file:
+                line = line.replace("\n", "")
+                money.append(line)
+            return money
     except FileNotFoundError:
         print("Could not find money file.")
         exit_program()
@@ -14,9 +20,10 @@ def readMoney():
         exit_program()
 
 #function to write to money file
-def writeMoney():
+def writeMoney(money):
     with open("money.txt", "w") as file:
-        file.write(money)
+        for row in money:
+            file.write(str(row) + "\n")
 
 if __name__ == "__main__":
     main()
