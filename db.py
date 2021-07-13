@@ -1,8 +1,11 @@
 #module for writing and reading money.txt file
+
+#import sys for terminating program
 import sys
 def exit_program():
     print("Terminating program.")
     sys.exit()
+    
 #function to read money file
 def readMoney():
     money = []
@@ -21,9 +24,17 @@ def readMoney():
 
 #function to write to money file
 def writeMoney(money):
-    with open("money.txt", "w") as file:
-        for row in money:
-            file.write(str(row) + "\n")
+    try:
+        with open("money.txt", "w") as file:
+            for row in money:
+                file.write(str(row) + "\n")
+    except OSError as e:
+        print(type(e), e)
+        exit_program()
+    except Exception as e:
+        print(type(e), e)
+        exit_program()
+        
 
 if __name__ == "__main__":
     main()

@@ -2,12 +2,6 @@
 import sys
 import random
 import db #import module created to write/read money file
-#db.readMoney()
-#db.writeMoney()
-
-print("BLACKJACK!")
-print("Blackjack payout is 3:2")
-print()
 
 #function to exit from the program 
 def exit_program():
@@ -47,7 +41,8 @@ def dealCard(deck):
 
 #function to get player bet
 def playerBet(money):
-        while True:
+    while True:
+        try:
             betAmount = float(input("Bet Amount: "))
             if betAmount < 5 or betAmount > 1000:
                 print("Invalid bet amount. Please bet between 5 and 1000.")
@@ -56,12 +51,18 @@ def playerBet(money):
                 print("Invalid bet amount. You cannot bet more money than you have.")
                 continue
             else:
-                newMoney = float(money[0]) - betAmount
+                newMoney = float(money[0]) - round(betAmount, 2)
                 money.clear()
                 money.append(newMoney)
                 db.writeMoney(money)
                 return betAmount
                 break
+        except ValueError:
+            print("Please enter a valid amount between 5 and 1000.")
+            continue
+        except Exception as e:
+            print(type(e), e)
+            continue
 
 #gameplay function
 def playGame(deck):
@@ -76,21 +77,27 @@ def playGame(deck):
     if float(money[0]) < 5:
         print("Money: " + str(money[0]))
         print("You need more money to play.")
-        buyChips = input("Would you like to add money to the wallet? (y/n)")
+        print()
+        buyChips = input("Would you like to add money to the wallet? (y/n) >>")
         while buyChips.lower() == "y":
-            buyAmount = float(input("\nHow much money will you add to your wallet? Enter 0 to exit without adding to your wallet. >>"))
-            if buyAmount == 0:
-                break
-            elif buyAmount >= 5:
-                newMoney = float(money[0]) + buyAmount
-                money.clear()
-                money.append(newMoney)
-                db.writeMoney(money)
-                buyChips = input("Continue adding money? (y/n)")
-                print()
-            else:
-                print("You do not have enough money to play.")
-                exit_program()
+            try:
+                buyAmount = float(input("\nHow much money will you add? >>"))
+                if buyAmount >= 5:
+                    newMoney = float(money[0]) + buyAmount
+                    money.clear()
+                    money.append(newMoney)
+                    db.writeMoney(money)
+                    buyChips = "n"
+                    print()
+                else:
+                    print("Minimum bet is 5. Please add a greater amount than minimum bet.")
+                    continue
+            except ValueError:
+                print("Please enter a valid amount of money to add.")
+                continue
+            except Exception as e:
+                print(type(e), e)
+                continue
         
     if float(money[0]) >= 5:
         print("Money: " + str(money[0]))
@@ -105,8 +112,8 @@ def playGame(deck):
         playerScore += int(points)
         #allow player to choose the value of A
         if pointValue(card) == 11:
-            num = input("\nDo you want this Ace to be 1 or 11?\n>")
-            while num !='1' or num !='11':
+            while True:
+                num = input("\nDo you want this Ace to be 1 or 11?\n>")
                 if num == '1':
                     playerScore -= 10
                     break
@@ -132,8 +139,8 @@ def playGame(deck):
         playerScore += points
         #allow user to choose value of A
         if pointValue(card) == 11:
-            num = input("Do you want this Ace to be 1 or 11?\n>")
-            while num !='1' or num !='11':
+            while True:
+                num = input("\nDo you want this Ace to be 1 or 11?\n>")
                 if num == '1':
                     playerScore -= 10
                     break
@@ -164,7 +171,7 @@ def playGame(deck):
         print("\n".join(playerHand))
         print()
 
-        #give player option to get dealt another card or to stick with what they have
+        #give player option to get dealt another card (hit) or to stick with what they have (stand)
         while playerScore < 21:
             choice = input("Hit or stand? (hit/stand): ")
             print()
@@ -176,9 +183,8 @@ def playGame(deck):
                 playerScore += points
                 #allow player to choose the value of A
                 if pointValue(card) == 11:
-                    num = input("Do you want this Ace to be 1 or 11?\n>")
-                    print()
-                    while num !='1' or num !='11':
+                    while True:
+                        num = input("\nDo you want this Ace to be 1 or 11?\n>")
                         if num == '1':
                             playerScore -= 10
                             break
@@ -211,11 +217,11 @@ def playGame(deck):
                     dealerScore += points
                     #in the presence of another A, set the value of an A to 1 for the dealer
                     if len(dealerHand) >= 2 and pointValue(card) == 11:
-                        if pointValue(dealerHand[0]) == 11 or pointValue(dealerHand[1]) == 11 or pointValue(dealerHand[2]) == 11:
+                        if pointValue(dealerHand[0]) == 11 or pointValue(dealerHand[1]) == 11:
                             dealerScore -= 10
                 break
             else:
-                print("Please enter hit or stand.")
+                print("Invalid response. Please enter hit or stand.")
                 continue
 
         #display points and dealer's cards
@@ -230,7 +236,8 @@ def playGame(deck):
         if playerScore == 21 and dealerScore < 21:
             print("YOU HAVE A BLACKJACK!")
             print("YOU WIN!")
-            winnings = betAmount * 1.5
+            winnings = round(betAmount * 1.5, 2)
+            print("Winnings: " + str(winnings))
             money = db.readMoney()
             newMoney = float(money[0]) + winnings
             money.clear()
@@ -240,7 +247,8 @@ def playGame(deck):
         elif playerScore == 21 and dealerScore > 21:
             print("YOU HAVE A BLACKJACK!")
             print("YOU WIN!")
-            winnings = betAmount * 1.5
+            winnings = round(betAmount * 1.5, 2)
+            print("Winnings: " + str(winnings))
             money = db.readMoney()
             newMoney = float(money[0]) + winnings
             money.clear()
@@ -249,7 +257,8 @@ def playGame(deck):
             print("Money: " + str(money[0]))
         elif playerScore > dealerScore and playerScore < 21:
             print("YOU WIN!")
-            winnings = betAmount * 1.5
+            winnings = round(betAmount * 1.5, 2)
+            print("Winnings: " + str(winnings))
             money = db.readMoney()
             newMoney = float(money[0]) + winnings
             money.clear()
@@ -259,7 +268,8 @@ def playGame(deck):
         elif (playerScore < dealerScore and playerScore != 21) and dealerScore > 21:
             print("DEALER BUSTS!")
             print("YOU WIN!")
-            winnings = betAmount * 1.5
+            winnings = round(betAmount * 1.5, 2)
+            print("Winnings: " + str(winnings))
             money = db.readMoney()
             newMoney = float(money[0]) + winnings
             money.clear()
@@ -271,7 +281,7 @@ def playGame(deck):
             money = db.readMoney()
             print("Money: " + str(money[0]))
         elif dealerScore == 21 and playerScore < 21:
-            print("Dealer has Blackjack.")
+            print("Dealer has BLACKJACK.")
             print("Sorry. You lose.")
             money = db.readMoney()
             print("Money: " + str(money[0]))
@@ -299,12 +309,16 @@ def playGame(deck):
             print("Money: " + str(money[0]))
 
 def main():
+    print("BLACKJACK!")
+    print("Blackjack payout is 3:2")
+    print()
     playAgain = "y"
     deck = deckOfCards()
     while playAgain.lower() == "y":
         playGame(deck)
         playAgain = input("\nPlay again? (y/n): ")
-    print("\nCome back soon! \nBye!")
+        print()
+    print("Come back soon! \nBye!")
 
 
 if __name__ == "__main__":
