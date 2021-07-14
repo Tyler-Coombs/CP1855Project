@@ -113,7 +113,8 @@ def playGame(deck):
         #allow player to choose the value of A
         if pointValue(card) == 11:
             while True:
-                num = input("\nDo you want this Ace to be 1 or 11?\n>")
+                print("\nYou've been dealt an " + str(card) + ".")
+                num = input("Do you want it to be worth 1 or 11?\n>")
                 if num == '1':
                     playerScore -= 10
                     break
@@ -137,10 +138,16 @@ def playGame(deck):
         deck.remove(card)
         points = pointValue(card)
         playerScore += points
-        #allow user to choose value of A
-        if pointValue(card) == 11:
+        #if player draws two aces, automatically set to 1 to prevent busting inadvertantly
+        if pointValue(playerHand[0]) == 11 and pointValue(playerHand[1]) == 11:
+                playerScore -= 10
+                print("\nYou've been dealt an " + str(card) + ".")
+                print("It's value is automatically set to 1.")
+        #allow user to choose value of A if only one is present in their hand
+        elif pointValue(card) == 11:
             while True:
-                num = input("\nDo you want this Ace to be 1 or 11?\n>")
+                print("\nYou've been dealt an " + str(card) + ".")
+                num = input("Do you want it to be worth 1 or 11?\n>")
                 if num == '1':
                     playerScore -= 10
                     break
@@ -181,19 +188,29 @@ def playGame(deck):
                 deck.remove(card)
                 points = pointValue(card)
                 playerScore += points
-                #allow player to choose the value of A
-                if pointValue(card) == 11:
+                #if Ace will push player over 21, set it's value to 1
+                if pointValue(card) == 11 and playerScore > 21:
+                    playerScore -= 10
+                    print("You've been dealt an " + str(card) + ".")
+                    print("It's value is automatically set to 1.")
+                    print()
+                #allow player to choose the value of A 
+                elif pointValue(card) == 11:
                     while True:
-                        num = input("\nDo you want this Ace to be 1 or 11?\n>")
+                        print("You've been dealt an " + str(card) + ".")
+                        num = input("Do you want it to be 1 or 11?\n>")
                         if num == '1':
                             playerScore -= 10
+                            print()
                             break
                         elif num == '11':
                             playerScore = playerScore
+                            print()
                             break
                         else:
                             print("You must choose 1 or 11")
                             continue
+                
                 print("YOUR CARDS")
                 print("\n".join(playerHand))
                 print()
@@ -203,10 +220,9 @@ def playGame(deck):
                     deck.remove(card)
                     points = pointValue(card)
                     dealerScore += points
-                    #in the presence of another A, set the value of A to 1 for the dealer
-                    if len(dealerHand) >= 2 and pointValue(card) == 11:
-                        if pointValue(dealerHand[0]) == 11 or pointValue(dealerHand[1]) == 11:
-                            dealerScore -= 10
+                    #if and Ace is drawn and will push dealer over 21, set the value of A to 1 for the dealer
+                    if pointValue(card) == 11 and dealerScore > 21:
+                        dealerScore -= 10
                 continue
             elif choice.lower() == "stand":
                 if dealerScore < 17: #when player stands, dealer should get cards until their score is >17
@@ -216,9 +232,8 @@ def playGame(deck):
                     points = pointValue(card)
                     dealerScore += points
                     #in the presence of another A, set the value of an A to 1 for the dealer
-                    if len(dealerHand) >= 2 and pointValue(card) == 11:
-                        if pointValue(dealerHand[0]) == 11 or pointValue(dealerHand[1]) == 11:
-                            dealerScore -= 10
+                    if pointValue(card) == 11 and dealerScore > 21:
+                        dealerScore -= 10
                 break
             else:
                 print("Invalid response. Please enter hit or stand.")
@@ -303,6 +318,10 @@ def playGame(deck):
             money.append(newMoney)
             db.writeMoney(money)
             print("Money: " + str(money[0]))
+        elif playerScore == dealerScore and playerScore > 21:
+            print("BUST. Sorry. You lose.")
+            money = db.readMoney()
+            print("Money: " + str(money[0]))
         elif playerScore > 21:
             print("BUST. Sorry. You lose.")
             money = db.readMoney()
@@ -313,8 +332,8 @@ def main():
     print("Blackjack payout is 3:2")
     print()
     playAgain = "y"
-    deck = deckOfCards()
     while playAgain.lower() == "y":
+        deck = deckOfCards()
         playGame(deck)
         playAgain = input("\nPlay again? (y/n): ")
         print()
